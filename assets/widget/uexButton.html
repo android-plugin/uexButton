@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport"
+	content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, user-scalable=no" />
+<link rel="stylesheet" type="text/css" href="css/index.css">
+<title>uexButton</title>
+<script type="text/javascript">
+    window.uexOnload = function() {
+        uexButton.onClick = function(index){
+            alert("被点击的按钮的id是:"+index);
+        }
+	}
+    
+    
+    function createButton(){
+        var id = 1001;
+        var x = 0;
+        var y = document.getElementById("tit").offsetHeight;
+        var width = 200;
+        var height = 90;
+        var jsonData = '{"title":"AppCan","titleColor":"#111111","bgImage":"res://btn.png","textSize":"18.789"}';
+        uexButton.open(id,x,y,width,height,jsonData);
+    }
+
+function closeButton(){
+    var id = 1001;
+    uexButton.close(id);
+}
+</script>
+</head>
+
+<body>
+	<div class="tit" id = "tit">Button</div>
+        <div class="conbor">
+            <div class="consj">
+            <br><br><br><br><br><br><br>
+                <input class="btn" type="button" value="创建按钮" onclick="createButton();"/>
+                <input class="btn" type="button" value="移除按钮" onclick="closeButton();"/>
+            </div>
+        </div>
+</body>
+</html>
