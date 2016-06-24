@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexButton" version="3.0.0" build="0">
+        uexName="uexButton" version="4.0.0" build="1">
+		<info>1:支持function传入</info>
 		<info>0:创建一个Button插件</info>
     </plugin>
 </uexplugins>
