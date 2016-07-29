@@ -60,11 +60,12 @@ public class EUExButton extends EUExBase {
     }
 
     public String create(String[] params) {
+        final String INVALID_CODE = "-1";
         if(params.length < 1) {
             if (BDebug.DEBUG) {
                 Log.i(TAG, "invalid params");
             }
-            return "-1";
+            return INVALID_CODE;
         }
 
         int opId = 0;
@@ -82,15 +83,16 @@ public class EUExButton extends EUExBase {
             h = jsonObject.optInt("height");
             jsonString = jsonObject.getJSONObject("data").toString();
             if (viewMap.containsKey(opId)) {
-                return "-1";
+                return INVALID_CODE;
             }
+            createButtonInUIThread(opId, x, y, w, h, jsonString);
+            return String.valueOf(opId);
         } catch (JSONException e) {
             if (BDebug.DEBUG) {
                 e.printStackTrace();
             }
         }
-        createButtonInUIThread(opId, x, y, w, h, jsonString);
-        return String.valueOf(opId);
+        return INVALID_CODE;
     }
     private int getRandomId() {
         return (int)(Math.random() * 100000);
