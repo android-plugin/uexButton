@@ -5,6 +5,8 @@
         className="org.zywx.wbpalmstar.plugin.uexbutton.EUExButton"
         uexName="uexButton" >
         <method name="open" />
+       <!--4.0插件新增方法-->
+       <method name="create" />
         <method name="close" />
     </plugin>
 </uexplugins>
