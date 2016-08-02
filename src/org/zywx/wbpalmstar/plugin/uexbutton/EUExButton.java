@@ -60,7 +60,7 @@ public class EUExButton extends EUExBase {
     }
 
     public String create(String[] params) {
-        final String INVALID_CODE = "-1";
+        final String INVALID_CODE = null;
         if(params.length < 1) {
             if (BDebug.DEBUG) {
                 Log.i(TAG, "invalid params");
