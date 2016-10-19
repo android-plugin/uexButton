@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
@@ -22,6 +25,7 @@ import java.util.Map;
 public class EUExButton extends EUExBase {
     public final String TAG = "EUExButton";
     public static final String onClickFunName = "uexButton.onClick";
+    final String TEXT_POP_WINDOW = "popWindow";
 
     private HashMap<Integer, View> viewMap = new HashMap<Integer, View>();
 
@@ -129,10 +133,6 @@ public class EUExButton extends EUExBase {
 
                     Button btn = new Button(mContext);
 
-                    RelativeLayout.LayoutParams btParams = new RelativeLayout.LayoutParams (w, h);
-                    btParams.leftMargin = x;
-                    btParams.topMargin = y;
-
                     if (titleString != null) {
                         btn.setText(titleString);
                     }
@@ -151,9 +151,21 @@ public class EUExButton extends EUExBase {
                     if (defaultImage != null) {
                         btn.setBackgroundDrawable(ImageColorUtils.bgColorDrawableSelector(defaultImage,defaultImage));
                     }
-
-
-                    addViewToCurrentWindow(btn, btParams);
+                    boolean alwaysFront = jsonObject.optBoolean("isAlwaysInFront", false);
+                    if (alwaysFront) {
+                        WindowManager mWindowManager = (WindowManager) mContext
+                                .getSystemService(Context.WINDOW_SERVICE);
+                        final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                                w, h, x, y, WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.OPAQUE);
+                        params.gravity = Gravity.LEFT | Gravity.TOP;
+                        btn.setTag(TEXT_POP_WINDOW);
+                        mWindowManager.addView(btn, params);
+                    } else {
+                        RelativeLayout.LayoutParams btParams = new RelativeLayout.LayoutParams(w, h);
+                        btParams.leftMargin = x;
+                        btParams.topMargin = y;
+                        addViewToCurrentWindow(btn, btParams);
+                    }
 
                     viewMap.put(opId, btn);
 
@@ -208,7 +220,13 @@ public class EUExButton extends EUExBase {
             @Override
             public void run() {
                 Button btnButton = (Button)viewMap.get(opId);
-                removeViewFromCurrentWindow(btnButton);
+                if (TEXT_POP_WINDOW.equals(btnButton.getTag())) {
+                    WindowManager mWindowManager = (WindowManager) mContext
+                            .getSystemService(Context.WINDOW_SERVICE);
+                    mWindowManager.removeView(btnButton);
+                } else {
+                    removeViewFromCurrentWindow(btnButton);
+                }
                 viewMap.remove(opId);
             }
         });
