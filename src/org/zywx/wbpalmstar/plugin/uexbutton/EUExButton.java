@@ -109,7 +109,7 @@ public class EUExButton extends EUExBase {
                         btn.setBackgroundDrawable(ImageColorUtils.bgColorDrawableSelector(defaultImage,defaultImage));
                     }
 
-                    boolean alwaysFront = jsonObject.optBoolean("alwaysInFront", false);
+                    boolean alwaysFront = jsonObject.optBoolean("isAlwaysInFront", false);
                     if (alwaysFront) {
                         WindowManager mWindowManager = (WindowManager) mContext
                                 .getSystemService(Context.WINDOW_SERVICE);
