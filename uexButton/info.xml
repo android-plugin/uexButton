@@ -2,6 +2,7 @@
 <uexplugins>
     <plugin
         uexName="uexButton" version="3.0.0" build="0">
-		<info>0:创建一个Button插件</info>
+		<info>0:添加置顶功能</info>
+		<build>0:创建一个Button插件</build>
     </plugin>
 </uexplugins>

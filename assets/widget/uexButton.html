@@ -12,15 +12,15 @@
             alert("被点击的按钮的id是:"+index);
         }
 	}
-    
-    
+
+
     function createButton(){
         var id = 1001;
         var x = 0;
         var y = document.getElementById("tit").offsetHeight;
         var width = 200;
         var height = 90;
-        var jsonData = '{"title":"AppCan","titleColor":"#111111","bgImage":"res://btn.png","textSize":"18.789"}';
+        var jsonData = '{"title":"AppCan","titleColor":"#111111","bgImage":"res://btn.png","textSize":"18.789", "alwaysInFront": true}';
         uexButton.open(id,x,y,width,height,jsonData);
     }
 
