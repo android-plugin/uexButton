@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexButton" version="4.0.1" build="1">
+        uexName="uexButton" version="4.0.0" build="1">
 		<info>1:添加置顶功能</info>
 		<build>0:uexButton 4.0插件</build>
     </plugin>
