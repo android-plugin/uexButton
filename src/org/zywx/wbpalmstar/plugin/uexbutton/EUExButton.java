@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -13,6 +14,7 @@ import android.widget.RelativeLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.zywx.wbpalmstar.base.BDebug;
 import org.zywx.wbpalmstar.engine.EBrowserView;
 import org.zywx.wbpalmstar.engine.universalex.EUExBase;
 import org.zywx.wbpalmstar.engine.universalex.EUExCallback;
@@ -21,72 +23,113 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EUExButton extends EUExBase {
-	public static final String onClickFunName = "uexButton.onClick";
+    public final String TAG = "EUExButton";
+    public static final String onClickFunName = "uexButton.onClick";
     final String TEXT_POP_WINDOW = "popWindow";
 
-	private HashMap<Integer, View> viewMap = new HashMap<Integer, View>();
+    private HashMap<Integer, View> viewMap = new HashMap<Integer, View>();
 
-	public EUExButton(Context context, EBrowserView inParent) {
-		super(context, inParent);
-	}
+    public EUExButton(Context context, EBrowserView inParent) {
+        super(context, inParent);
+    }
 
-	public void open(String[] params) {
-		if (params.length != 6) {
-			return;
-		}
-		int opId = 0;
-		int x = 0;
-		int y = 0;
-		int w = 0;
-		int h = 0;
-		String jsonString = null;
-		try {
-			opId = Integer.parseInt(params[0]);
-			x = Integer.parseInt(params[1]);
-			y = Integer.parseInt(params[2]);
-			w = Integer.parseInt(params[3]);
-			h = Integer.parseInt(params[4]);
-			jsonString = params[5];
+    public void open(String[] params) {
+        if (params.length != 6) {
+            return;
+        }
+        int opId = 0;
+        int x = 0;
+        int y = 0;
+        int w = 0;
+        int h = 0;
+        String jsonString = null;
+        try {
+            opId = Integer.parseInt(params[0]);
+            x = Integer.parseInt(params[1]);
+            y = Integer.parseInt(params[2]);
+            w = Integer.parseInt(params[3]);
+            h = Integer.parseInt(params[4]);
+            jsonString = params[5];
 
-			if (viewMap.containsKey(opId)) {
-				return;
-			}
+            if (viewMap.containsKey(opId)) {
+                return;
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		createButtonInUIThread(opId, x, y, w, h, jsonString);
+        createButtonInUIThread(opId, x, y, w, h, jsonString);
 
-	}
+    }
 
-	private void createButtonInUIThread(final int opId, final int x, final int y, final int w, final int h, final String jsonString)
-	{
-		((Activity) mContext).runOnUiThread(new Runnable() {
+    public String create(String[] params) {
+        final String INVALID_CODE = null;
+        if(params.length < 1) {
+            if (BDebug.DEBUG) {
+                Log.i(TAG, "invalid params");
+            }
+            return INVALID_CODE;
+        }
 
-			@Override
-			public void run() {
-				try {
-					JSONObject jsonObject = new JSONObject(jsonString);
-//					'{"title":"AppCan","textSize":"15" "titleColor":"#111111","bgImage":"res://a1.png"}';
+        int opId = 0;
+        int x = 0;
+        int y = 0;
+        int w = 0;
+        int h = 0;
+        String jsonString = null;
+        try {
+            JSONObject jsonObject = new JSONObject(params[0]);
+            opId = jsonObject.optInt("id", getRandomId());
+            x = jsonObject.optInt("x");
+            y = jsonObject.optInt("y");
+            w = jsonObject.optInt("width");
+            h = jsonObject.optInt("height");
+            jsonString = jsonObject.getJSONObject("data").toString();
+            if (viewMap.containsKey(opId)) {
+                return INVALID_CODE;
+            }
+            createButtonInUIThread(opId, x, y, w, h, jsonString);
+            return String.valueOf(opId);
+        } catch (JSONException e) {
+            if (BDebug.DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return INVALID_CODE;
+    }
+    private int getRandomId() {
+        return (int)(Math.random() * 100000);
+    }
 
-					String titleString = null;
-					String titleColorString = null;
-					String bgImagePathString = null;
-					int textSize = 0;
-					if (jsonObject.has("title")) {
-						titleString = jsonObject.getString("title");
-					}
 
-					if (jsonObject.has("titleColor")) {
-						titleColorString = jsonObject.getString("titleColor");
-					}
+    private void createButtonInUIThread(final int opId, final int x, final int y, final int w, final int h, final String jsonString)
+    {
+        ((Activity) mContext).runOnUiThread(new Runnable() {
 
-					if (jsonObject.has("textSize")) {
-						textSize = jsonObject.getInt("textSize");
-					}
+            @Override
+            public void run() {
+                try {
+                    JSONObject jsonObject = new JSONObject(jsonString);
+//             '{"title":"AppCan","textSize":"15" "titleColor":"#111111","bgImage":"res://a1.png"}';
 
-					bgImagePathString = jsonObject.getString("bgImage");
+                    String titleString = null;
+                    String titleColorString = null;
+                    String bgImagePathString = null;
+                    int textSize = 0;
+                    if (jsonObject.has("title")) {
+                        titleString = jsonObject.getString("title");
+                    }
+
+                    if (jsonObject.has("titleColor")) {
+                        titleColorString = jsonObject.getString("titleColor");
+                    }
+
+                    if (jsonObject.has("textSize")) {
+                        textSize = jsonObject.getInt("textSize");
+                    }
+
+                    bgImagePathString = jsonObject.getString("bgImage");
 
                     Button btn = new Button(mContext);
 
@@ -108,7 +151,6 @@ public class EUExButton extends EUExBase {
                     if (defaultImage != null) {
                         btn.setBackgroundDrawable(ImageColorUtils.bgColorDrawableSelector(defaultImage,defaultImage));
                     }
-
                     boolean alwaysFront = jsonObject.optBoolean("isAlwaysInFront", false);
                     if (alwaysFront) {
                         WindowManager mWindowManager = (WindowManager) mContext
@@ -116,8 +158,8 @@ public class EUExButton extends EUExBase {
                         final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                                 w, h, x, y, WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.OPAQUE);
                         params.gravity = Gravity.LEFT | Gravity.TOP;
-                        mWindowManager.addView(btn, params);
                         btn.setTag(TEXT_POP_WINDOW);
+                        mWindowManager.addView(btn, params);
                     } else {
                         RelativeLayout.LayoutParams btParams = new RelativeLayout.LayoutParams(w, h);
                         btParams.leftMargin = x;
@@ -125,27 +167,27 @@ public class EUExButton extends EUExBase {
                         addViewToCurrentWindow(btn, btParams);
                     }
 
-					viewMap.put(opId, btn);
+                    viewMap.put(opId, btn);
 
-					MyButtonListener listener = new MyButtonListener();
-					btn.setOnClickListener(listener);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+                    MyButtonListener listener = new MyButtonListener();
+                    btn.setOnClickListener(listener);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
-	public class MyButtonListener implements View.OnClickListener {
-		@Override
-		public void onClick(View arg0) {
-			int opId = getKeyFromViewMaps(arg0);
-			jsCallback(onClickFunName, opId, EUExCallback.F_C_INT, EUExCallback.F_C_SUCCESS);
-		}
-	}
+    public class MyButtonListener implements View.OnClickListener {
+        @Override
+        public void onClick(View arg0) {
+            int opId = getKeyFromViewMaps(arg0);
+            jsCallback(onClickFunName, opId, EUExCallback.F_C_INT, EUExCallback.F_C_SUCCESS);
+        }
+    }
 
-	private int getKeyFromViewMaps(View btn) {
-		for (Map.Entry<Integer,View> e : viewMap.entrySet()) {
+    private int getKeyFromViewMaps(View btn) {
+        for (Map.Entry<Integer,View> e : viewMap.entrySet()) {
             Integer key = e.getKey();
             View value2 = (View) e.getValue();
             if (value2 == btn)
@@ -153,31 +195,31 @@ public class EUExButton extends EUExBase {
                 return key;
             }
         }
-		return -1;
-	}
+        return -1;
+    }
 
 
-	public void close(String[] params) {
-		if (params.length != 1) {
-			return;
-		}
-		int opId = 0;
-		try {
-			opId = Integer.parseInt(params[0]);
-			if (viewMap.containsKey(opId)) {
-				closeButtonInUIThread(opId);
-			}
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-			return;
-		}
-	}
+    public void close(String[] params) {
+        if (params.length != 1) {
+            return;
+        }
+        int opId = 0;
+        try {
+            opId = Integer.parseInt(params[0]);
+            if (viewMap.containsKey(opId)) {
+                closeButtonInUIThread(opId);
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return;
+        }
+    }
 
-	private void closeButtonInUIThread(final int opId) {
-		((Activity) mContext).runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Button btnButton = (Button)viewMap.get(opId);
+    private void closeButtonInUIThread(final int opId) {
+        ((Activity) mContext).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Button btnButton = (Button)viewMap.get(opId);
                 if (TEXT_POP_WINDOW.equals(btnButton.getTag())) {
                     WindowManager mWindowManager = (WindowManager) mContext
                             .getSystemService(Context.WINDOW_SERVICE);
@@ -185,13 +227,13 @@ public class EUExButton extends EUExBase {
                 } else {
                     removeViewFromCurrentWindow(btnButton);
                 }
-				viewMap.remove(opId);
-			}
-		});
-	}
+                viewMap.remove(opId);
+            }
+        });
+    }
 
-	@Override
-	protected boolean clean() {
-		return false;
-	}
+    @Override
+    protected boolean clean() {
+        return false;
+    }
 }
